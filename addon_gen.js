@@ -1,16 +1,21 @@
 var nameInput;
 var versionInput;
 var authorInput;
+var modeInput;
 var packageInput;
 var mainClassInput;
+var descriptionInput;
 var generateButton;
 var generateWithoutFlashButton;
+
 function init() {
 	nameInput = document.getElementById("plugin-name-input");
 	versionInput = document.getElementById("plugin-version-input");
 	authorInput = document.getElementById("plugin-author-input");
+	modeInput = document.getElementById("plugin-mode-input");
 	packageInput = document.getElementById("plugin-package-input");
 	mainClassInput = document.getElementById("plugin-mainclass-input");
+	descriptionInput = document.getElementById("plugin-description-input");
 
 	generateButton = document.getElementById(
 		"download-without-flash-button");
@@ -56,8 +61,8 @@ function generateAddon() {
 		alert("The author name must not be blank.");
 		throw new Error();
 	}
-	var pluginMode = "BOTH"; //FIXME
-	var pluginDescription = "";
+	var pluginMode = modeInput.value;
+	var pluginDescription = descriptionInput.value;
 	var packageName = packageInput.value;
 	if (packageName === "") {
 		alert("The package name must not be blank.");
