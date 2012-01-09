@@ -12,7 +12,7 @@ function init() {
 	nameInput = document.getElementById("plugin-name-input");
 	versionInput = document.getElementById("plugin-version-input");
 	authorInput = document.getElementById("plugin-author-input");
-	modeInput = document.getElementById("plugin-mode-input");
+	//modeInput = document.getElementById("plugin-mode-input");
 	packageInput = document.getElementById("plugin-package-input");
 	mainClassInput = document.getElementById("plugin-mainclass-input");
 	descriptionInput = document.getElementById("plugin-description-input");
@@ -53,7 +53,7 @@ function generateAddon() {
 	}
 	var pluginVersion = versionInput.value;
 	if (pluginVersion === "") {
-		alert("No plugin version was enteredl using 1.0.0");
+		alert("No plugin version was entered: using 1.0.0");
 		pluginVersion = "1.0.0";
 	}
 	var pluginAuthor = authorInput.value;
@@ -61,7 +61,8 @@ function generateAddon() {
 		alert("The author name must not be blank.");
 		throw new Error();
 	}
-	var pluginMode = modeInput.value;
+	var pluginMode = "startup"; //FIXME
+	var pluginPlatform = "BOTH"; //FIXME
 	var pluginDescription = descriptionInput.value;
 	var packageName = packageInput.value;
 	if (packageName === "") {
@@ -98,7 +99,7 @@ function generateAddon() {
 	var mainClassFileContent = generateMainClassFile(packageName, mainClassName);
 	//alert(mainClassFileContent);
 	var addonYamlFileContent = generateAddonYaml(pluginName, pluginVersion, pluginAuthor, 
-	pluginDescription, packageName, mainClassName, pluginMode);
+	pluginDescription, packageName, mainClassName, pluginMode, pluginPlatform);
 	//alert(addonYamlFileContent);
 	var addonPomFileContent = generateAddonPom(pluginName, packageName);
 	//alert(addonPomFileContent);
@@ -106,42 +107,41 @@ function generateAddon() {
 	var zip = new JSZip();
 	zip.add(pluginName + "/src/main/java/" + packageName.replace(/\./g, "/") + "/" + mainClassName + ".java", 
 		mainClassFileContent);
-	zip.add(pluginName + "/src/main/resources/addon.yml", addonYamlFileContent);
+	zip.add(pluginName + "/src/main/resources/spoutplugin.yml", addonYamlFileContent);
 	zip.add(pluginName + "/pom.xml", addonPomFileContent);
 	return zip.generate();
 }
 
 function generateMainClassFile(packageName, mainClassName) {
-	return "package " + packageName + ";\n" + 
-	"import java.util.logging.Logger;\n" + 
-	"import org.spoutcraft.spoutcraftapi.addon.AddonDescriptionFile;\n" + 	
-	"import org.spoutcraft.spoutcraftapi.addon.java.JavaAddon;\n" + 
-	"public class " + mainClassName + " extends JavaAddon {\n" + 
-	"	public Logger log = Logger.getLogger(\"Spoutcraft\");\n" + 
-	"	public AddonDescriptionFile adfFile;\n\n" + 
+	return "package " + packageName + ";\n" +  	
+	"import org.spout.api.plugin.CommonPlugin;\n" +
+	"import org.spout.api.plugin.PluginDescriptionFile;\n" +  
+	"public class " + mainClassName + " extends CommonPlugin {\n" +
+	"	private PluginDescriptionFile pdfFile;\n\n" + 
 
 	"	@Override\n" + 
 	"	public void onDisable() {\n" + 
-	"		log.info(adfFile.getFullName() + \" has been disabled!\");\n" + 
+	"		getLogger().info(pdfFile.getFullName() + \" has been disabled!\");\n" + 
 	"	}\n\n" + 
 
 	"	@Override\n" + 
 	"	public void onEnable() {\n" + 
-	"		adfFile = getDescription();\n" + 
-	"		log.info(adfFile.getFullName() + \" has been enabled!\");\n" + 
+	"		pdfFile = getDescription();\n" + 
+	"		getLogger().info(pdfFile.getFullName() + \" has been enabled!\");\n" + 
 	"	}\n" + 
 	"}\n";
 
 }
 
 function generateAddonYaml(pluginName, pluginVersion, pluginAuthor, 
-	pluginDescription, packageName, mainClassName, pluginMode) {
+	pluginDescription, packageName, mainClassName, pluginLoad, pluginPlatform) {
 	return  "name: " + pluginName + "\n" + 
 		"version: " + pluginVersion + "\n" + 
 		"description: " + pluginDescription + "\n" + 
 		"author: " + pluginAuthor + "\n" + 
 		"main: " + packageName + "." + mainClassName + "\n" + 
-		"mode: " + pluginMode + "\n";
+		"load: " + pluginLoad + "\n" + 
+		"platform: " + pluginPlatform + "\n";
 }
 
 function generateAddonPom(pluginName, packageName) {
@@ -166,8 +166,8 @@ return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://
 "	<!--  Dependencies -->\n" + 
 "	<dependencies>\n" + 
 "		<dependency>\n" + 
-"			<groupId>org.spoutcraft</groupId>\n" + 
-"			<artifactId>spoutcraftapi</artifactId>\n" + 
+"			<groupId>org.getspout</groupId>\n" + 
+"			<artifactId>spoutapi</artifactId>\n" + 
 "			<version>dev-SNAPSHOT</version>\n" + 
 "			<type>jar</type>\n" + 
 "			<scope>provided</scope>\n" + 
@@ -183,7 +183,7 @@ return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://
 "				<filtering>true</filtering>\n" + 
 "				<directory>${basedir}/src/main/resources</directory>\n" + 
 "				<includes>\n" + 
-"					<include>addon.yml</include>\n" + 
+"					<include>spoutplugin.yml</include>\n" + 
 "				</includes>\n" + 
 "			</resource>\n" + 
 "		</resources>\n" + 
