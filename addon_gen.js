@@ -41,6 +41,7 @@ function onGenerateButtonClicked(event) {
 		var generatedData = generateAddon();
 		window.location.href="data:application/zip;base64," + generatedData;
 	} catch(err) {
+		if (console) console.log(err);
 	}
 }
 
@@ -105,10 +106,10 @@ function generateAddon() {
 	//alert(addonPomFileContent);
 
 	var zip = new JSZip();
-	zip.add(pluginName + "/src/main/java/" + packageName.replace(/\./g, "/") + "/" + mainClassName + ".java", 
+	zip.file(pluginName + "/src/main/java/" + packageName.replace(/\./g, "/") + "/" + mainClassName + ".java", 
 		mainClassFileContent);
-	zip.add(pluginName + "/src/main/resources/spoutplugin.yml", addonYamlFileContent);
-	zip.add(pluginName + "/pom.xml", addonPomFileContent);
+	zip.file(pluginName + "/src/main/resources/properties.yml", addonYamlFileContent);
+	zip.file(pluginName + "/pom.xml", addonPomFileContent);
 	return zip.generate();
 }
 
@@ -160,13 +161,13 @@ return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://
 "	<repositories>\n" + 
 "		<repository>\n" + 
 "			<id>spout-repo</id>\n" + 
-"			<url>http://repo.getspout.org</url>\n" + 
+"			<url>http://repo.spout.org</url>\n" + 
 "		</repository>\n" + 
 "	</repositories>\n" + 
 "	<!--  Dependencies -->\n" + 
 "	<dependencies>\n" + 
 "		<dependency>\n" + 
-"			<groupId>org.getspout</groupId>\n" + 
+"			<groupId>org.spout</groupId>\n" + 
 "			<artifactId>spoutapi</artifactId>\n" + 
 "			<version>dev-SNAPSHOT</version>\n" + 
 "			<type>jar</type>\n" + 
