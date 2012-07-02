@@ -184,7 +184,7 @@ return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://
 "				<filtering>true</filtering>\n" + 
 "				<directory>${basedir}/src/main/resources</directory>\n" + 
 "				<includes>\n" + 
-"					<include>spoutplugin.yml</include>\n" + 
+"					<include>properties.yml</include>\n" + 
 "				</includes>\n" + 
 "			</resource>\n" + 
 "		</resources>\n" + 
